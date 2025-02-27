@@ -19,6 +19,7 @@
 #ifndef __moveresize_h
 #define __moveresize_h
 
+#include <X11/Xlib.h>
 #include <glib.h>
 
 #ifdef SYNC
