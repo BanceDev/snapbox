@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2014-11-05 16:51+0100\n"
+"POT-Creation-Date: 2018-03-12 14:46+0100\n"
 "PO-Revision-Date: 2014-11-18 22:28+0100\n"
 "Last-Translator: Richard Penman <richard.penman@gmail.com>\n"
 "Language-Team: Esperanto\n"
@@ -39,7 +39,7 @@ msgstr "Effektivigi"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Malsukcesis konverti la vojon \"%s\" el utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3665
+#: openbox/actions/exit.c:69 openbox/client.c:3675
 msgid "Cancel"
 msgstr "Nuligi"
 
@@ -63,19 +63,19 @@ msgstr "Ĉu vi certas ke vi volas eliri Openbox?"
 msgid "Exit Openbox"
 msgstr "Eliri Openbox"
 
-#: openbox/client.c:2115
+#: openbox/client.c:2120
 msgid "Unnamed Window"
 msgstr "Sennoma Fenestro"
 
-#: openbox/client.c:2129 openbox/client.c:2160
+#: openbox/client.c:2135 openbox/client.c:2166
 msgid "Killing..."
 msgstr "Mortiganta ..."
 
-#: openbox/client.c:2131 openbox/client.c:2162
+#: openbox/client.c:2137 openbox/client.c:2168
 msgid "Not Responding"
 msgstr "Ne Respondante"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3664
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -84,11 +84,11 @@ msgstr ""
 "Ŝajne la fenestro \"%s\" ne respondas. Ĉu vi volas devigi ĝin eliri per "
 "sendi la %s signalo?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3666
 msgid "End Process"
 msgstr "Fina Procezo"
 
-#: openbox/client.c:3660
+#: openbox/client.c:3670
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -97,7 +97,7 @@ msgstr ""
 "Ŝajne la fenestro \"%s\" ne respondas. Ĉu vi volas malkonekti ĝin de la X-"
 "servilo?"
 
-#: openbox/client.c:3662
+#: openbox/client.c:3672
 msgid "Disconnect"
 msgstr "Malkonekti"
 
@@ -185,17 +185,17 @@ msgstr "Mal/_Ornami"
 msgid "_Close"
 msgstr "_Fermi"
 
-#: openbox/config.c:563
+#: openbox/config.c:567
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Nevalida kunteksto \"%s\" en musa ligilo"
 
-#: openbox/config.c:931
+#: openbox/config.c:949
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Nevalida butono \"%s\" specifita en agorda dosiero"
 
-#: openbox/config.c:956
+#: openbox/config.c:974
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
