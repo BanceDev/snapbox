@@ -363,7 +363,7 @@ static void do_move(gboolean keyboard, gint keydist) {
 
 	screen_pointer_pos(&x, &y);
 
-	m = client_monitor(moveresize_client);
+	guint m = client_monitor(moveresize_client);
 	const Rect *a = screen_physical_area_monitor(m);
 	gint height = RECT_BOTTOM(*a) - RECT_TOP(*a);
 	gint width = RECT_RIGHT(*a) - RECT_LEFT(*a);
