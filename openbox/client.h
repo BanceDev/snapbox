@@ -272,6 +272,14 @@ struct _ObClient
     gboolean snapped_left;
     /*! The window is snapped to fill the right side of the screen */
     gboolean snapped_right;
+    /*! The window is snapped to fill the top left corner of the screen */
+    gboolean snapped_top_left;
+    /*! The window is snapped to fill the top right corner of the screen */
+    gboolean snapped_top_right;
+    /*! The window is snapped to fill the bottom left corner of the screen */
+    gboolean snapped_bottom_left;
+    /*! The window is snapped to fill the bottom right corner of the screen */
+    gboolean snapped_bottom_right;
     /*! The window should not be displayed by pagers */
     gboolean skip_pager;
     /*! The window should not be displayed by taskbars */

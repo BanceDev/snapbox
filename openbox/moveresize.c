@@ -363,11 +363,13 @@ static void do_move(gboolean keyboard, gint keydist) {
 
 	screen_pointer_pos(&x, &y);
 
-	const Rect *a = screen_physical_area_active();
+	m = client_monitor(moveresize_client);
+	const Rect *a = screen_physical_area_monitor(m);
 	gint height = RECT_BOTTOM(*a) - RECT_TOP(*a);
 	gint width = RECT_RIGHT(*a) - RECT_LEFT(*a);
 
 	if (moveresize_client->max_horz && moveresize_client->max_vert && y > 0) {
+		// restore window from maximized
 		client_maximize(moveresize_client, FALSE, 0);
 		start_cx = 0;
 		start_cy = 0;
