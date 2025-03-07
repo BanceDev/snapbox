@@ -197,6 +197,9 @@ extern gint config_mouse_screenedgetime;
 /*! When TRUE, the mouse is warped to the other side of the desktop after
   switching desktops from bumping the screen edge */
 extern gboolean config_mouse_screenedgewarp;
+/*! Number of milliseconds that the mouse has to be on the screen edge before
+  a snap event is triggered */
+extern gint config_mouse_snaptime;
 
 /*! Number of pixels to resist while crossing another window's edge */
 extern gint config_resist_win;

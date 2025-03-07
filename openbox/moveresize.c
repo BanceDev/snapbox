@@ -51,6 +51,7 @@ XSyncAlarm moveresize_alarm = None;
 #endif
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
+static gboolean should_snap = FALSE;
 
 /* starting geometry for the window being moved/resized, so it can be
    restored */
@@ -63,6 +64,7 @@ static guint32 corner;
 static ObDirection edge_warp_dir = -1;
 static gboolean edge_warp_odd = FALSE;
 static guint edge_warp_timer = 0;
+static guint edge_snap_timer = 0;
 static ObDirection key_resize_edge = -1;
 static guint waiting_for_sync;
 #ifdef SYNC
@@ -349,6 +351,19 @@ void moveresize_end(gboolean cancel) {
 	moveresize_client = NULL;
 }
 
+static gboolean in_snap_zone = FALSE;
+
+static gboolean edge_snap_delay_func(gpointer data) {
+	if (in_snap_zone) {
+		should_snap = TRUE;
+		edge_snap_timer = 0;
+		return FALSE;
+	} else {
+		should_snap = FALSE;
+	}
+	return TRUE; /* do repeat ! */
+}
+
 static void do_move(gboolean keyboard, gint keydist) {
 	gint resist, x, y;
 
@@ -362,15 +377,31 @@ static void do_move(gboolean keyboard, gint keydist) {
 	resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
 
 	screen_pointer_pos(&x, &y);
+	guint cur_monitor = screen_monitor_pointer();
 
-	guint m = client_monitor(moveresize_client);
-	const Rect *a = screen_physical_area_monitor(m);
+	const Rect *a = screen_physical_area_monitor(cur_monitor);
 	gint height = RECT_BOTTOM(*a) - RECT_TOP(*a);
 	gint width = RECT_RIGHT(*a) - RECT_LEFT(*a);
 
-	if (moveresize_client->max_horz && moveresize_client->max_vert && y > 0) {
+	gint monitor_origin_x = RECT_LEFT(*a);
+	gint monitor_origin_y = RECT_TOP(*a);
+	x = x - monitor_origin_x;
+	y = y - monitor_origin_y;
+
+	if (!in_snap_zone && edge_snap_timer != 0) {
+		g_source_remove(edge_snap_timer);
+		edge_snap_timer = 0;
+	}
+
+	if (edge_snap_timer == 0) {
+		edge_snap_timer =
+			g_timeout_add(config_mouse_snaptime, edge_snap_delay_func, NULL);
+	}
+
+	if (moveresize_client->max_horz && moveresize_client->max_vert && y > 20) {
 		// restore window from maximized
 		client_maximize(moveresize_client, FALSE, 0);
+		in_snap_zone = FALSE;
 		start_cx = 0;
 		start_cy = 0;
 		start_x = ((x - cur_x) * moveresize_client->area.width) / cur_w;
@@ -379,36 +410,50 @@ static void do_move(gboolean keyboard, gint keydist) {
 		cur_y = y - start_y;
 		cur_w = moveresize_client->area.width;
 		cur_h = moveresize_client->area.height;
-	} else if (y == 0 && !moveresize_client->snapped_left &&
+	} else if (y <= 20 && !moveresize_client->snapped_left &&
 			   !moveresize_client->snapped_right) {
+		in_snap_zone = TRUE;
 		// fullscreen if at the top
-		client_maximize(moveresize_client, TRUE, 0);
-	} else if (x == 0 && !moveresize_client->snapped_left &&
+		if (should_snap) {
+			client_maximize(moveresize_client, TRUE, 0);
+			should_snap = FALSE;
+		}
+	} else if (x <= 20 && !moveresize_client->snapped_left &&
 			   !moveresize_client->max_horz && !moveresize_client->max_vert) {
-		moveresize_client->pre_max_area.x = cur_x;
-		moveresize_client->pre_max_area.y = cur_y;
-		moveresize_client->pre_max_area.width = cur_w;
-		moveresize_client->pre_max_area.height = cur_h;
-		client_maximize(moveresize_client, TRUE, 2);
-		moveresize_client->snapped_left = TRUE;
-	} else if (x > 0 && moveresize_client->snapped_left &&
+		in_snap_zone = TRUE;
+		if (should_snap) {
+			moveresize_client->pre_max_area.x = cur_x + monitor_origin_x;
+			moveresize_client->pre_max_area.y = cur_y + monitor_origin_y;
+			moveresize_client->pre_max_area.width = cur_w;
+			moveresize_client->pre_max_area.height = cur_h;
+			client_maximize(moveresize_client, TRUE, 2);
+			moveresize_client->snapped_left = TRUE;
+			should_snap = FALSE;
+		}
+	} else if (x > 20 && moveresize_client->snapped_left &&
 			   !moveresize_client->max_horz) {
+		in_snap_zone = FALSE;
 		cur_x = moveresize_client->pre_max_area.x;
 		cur_y = moveresize_client->pre_max_area.y;
 		cur_w = moveresize_client->pre_max_area.width;
 		cur_h = moveresize_client->pre_max_area.height;
 		client_maximize(moveresize_client, FALSE, 2);
 		moveresize_client->snapped_left = FALSE;
-	} else if (x == width && !moveresize_client->snapped_right &&
+	} else if (x >= width - 20 && !moveresize_client->snapped_right &&
 			   !moveresize_client->max_horz && !moveresize_client->max_vert) {
-		moveresize_client->pre_max_area.x = cur_x;
-		moveresize_client->pre_max_area.y = cur_y;
-		moveresize_client->pre_max_area.width = cur_w;
-		moveresize_client->pre_max_area.height = cur_h;
-		client_maximize(moveresize_client, TRUE, 2);
-		moveresize_client->snapped_right = TRUE;
-	} else if (x < width && moveresize_client->snapped_right &&
+		in_snap_zone = TRUE;
+		if (should_snap) {
+			moveresize_client->pre_max_area.x = cur_x + monitor_origin_x;
+			moveresize_client->pre_max_area.y = cur_y + monitor_origin_y;
+			moveresize_client->pre_max_area.width = cur_w;
+			moveresize_client->pre_max_area.height = cur_h;
+			client_maximize(moveresize_client, TRUE, 2);
+			moveresize_client->snapped_right = TRUE;
+			should_snap = FALSE;
+		}
+	} else if (x < width - 20 && moveresize_client->snapped_right &&
 			   !moveresize_client->max_horz) {
+		in_snap_zone = FALSE;
 		cur_x = moveresize_client->pre_max_area.x;
 		cur_y = moveresize_client->pre_max_area.y;
 		cur_w = moveresize_client->pre_max_area.width;
@@ -418,12 +463,12 @@ static void do_move(gboolean keyboard, gint keydist) {
 	}
 
 	if (moveresize_client->snapped_left) {
-		cur_x = 0;
-		cur_y = 0;
+		cur_x = 0 + monitor_origin_x;
+		cur_y = 0 + monitor_origin_y;
 		cur_w = (width / 2) - 1;
 	} else if (moveresize_client->snapped_right) {
-		cur_x = width / 2;
-		cur_y = 0;
+		cur_x = width / 2 + monitor_origin_x;
+		cur_y = 0 + monitor_origin_y;
 		cur_w = width / 2;
 	}
 
