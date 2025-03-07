@@ -93,7 +93,6 @@ gint config_mouse_threshold;
 gint config_mouse_dclicktime;
 gint config_mouse_screenedgetime;
 gboolean config_mouse_screenedgewarp;
-gint config_mouse_snaptime;
 
 guint config_menu_hide_delay;
 gboolean config_menu_middle;
@@ -1125,7 +1124,6 @@ void config_startup(ObtXmlInst *i) {
 	config_mouse_dclicktime = 500;
 	config_mouse_screenedgetime = 400;
 	config_mouse_screenedgewarp = FALSE;
-	config_mouse_snaptime = 200;
 
 	bind_default_mouse();
 
