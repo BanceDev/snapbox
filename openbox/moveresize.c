@@ -401,10 +401,16 @@ static void do_move(gboolean keyboard, gint keydist) {
 		moveresize_client->snapped_left = TRUE;
 	} else if (x > 20 && moveresize_client->snapped_left &&
 			   !moveresize_client->max_horz) {
-		cur_x = moveresize_client->pre_max_area.x;
-		cur_y = moveresize_client->pre_max_area.y;
-		cur_w = moveresize_client->pre_max_area.width;
-		cur_h = moveresize_client->pre_max_area.height;
+		start_cx = 0;
+		start_cy = 0;
+		start_x = ((x - cur_x) * moveresize_client->area.width) / cur_w +
+				  monitor_origin_x + (width / 4);
+		start_y = ((y - cur_y) * moveresize_client->area.height) / cur_h +
+				  monitor_origin_y;
+		cur_x = x - start_x;
+		cur_y = y - start_y;
+		cur_w = moveresize_client->area.width;
+		cur_h = moveresize_client->area.height;
 		client_maximize(moveresize_client, FALSE, 2);
 		moveresize_client->snapped_left = FALSE;
 	} else if (x >= width - 20 && !moveresize_client->snapped_right &&
@@ -417,10 +423,16 @@ static void do_move(gboolean keyboard, gint keydist) {
 		moveresize_client->snapped_right = TRUE;
 	} else if (x < width - 20 && moveresize_client->snapped_right &&
 			   !moveresize_client->max_horz) {
-		cur_x = moveresize_client->pre_max_area.x;
-		cur_y = moveresize_client->pre_max_area.y;
-		cur_w = moveresize_client->pre_max_area.width;
-		cur_h = moveresize_client->pre_max_area.height;
+		start_cx = 0;
+		start_cy = 0;
+		start_x = ((x - cur_x) * moveresize_client->area.width) / cur_w +
+				  monitor_origin_x - (width / 4);
+		start_y = ((y - cur_y) * moveresize_client->area.height) / cur_h +
+				  monitor_origin_y;
+		cur_x = x - start_x;
+		cur_y = y - start_y;
+		cur_w = moveresize_client->area.width;
+		cur_h = moveresize_client->area.height;
 		client_maximize(moveresize_client, FALSE, 2);
 		moveresize_client->snapped_right = FALSE;
 	}
